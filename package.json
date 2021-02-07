@@ -1,0 +1,42 @@
+{
+  "name": "ordinga",
+  "version": "1.0.0",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "node ./src/app",
+    "dev": "nodemon /src/app",
+    "start:prod": "export NODE_ENV=production&&node ./src/app",
+    "lint": "eslint --report-unused-disable-directives .",
+    "lint:fix": "eslint --fix ."
+  },
+  "author": "Akveo",
+  "license": "ISC",
+  "dependencies": {
+    "app-root-path": "^2.2.1",
+    "body-parser": "^1.18.3",
+    "config": "^3.0.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "express": "^4.16.4",
+    "firebase-admin": "^8.9.2",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.0",
+    "mongodb": "^3.2.2",
+    "nodemailer": "^6.4.2",
+    "openssl": "^1.1.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-oauth2": "^1.5.0",
+    "passport-oauth2-middleware": "^1.0.3",
+    "passport-oauth2-refresh": "^1.1.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "nodemon": "^1.19.4"
+  }
+}
