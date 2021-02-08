@@ -55,6 +55,10 @@ app.use(`${root}/:type`, (req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
 app.use(logErrors);
 app.use(clientErrorHandler);
 

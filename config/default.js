@@ -31,8 +31,8 @@ module.exports = {
   },
 
   db: {
-    url: 'mongodb+srv://ordinga-api-user:ujPASH0d7EKPElsg@cluster0-yyzf5.azure.mongodb.net/heroku_dmgfwrg5?retryWrites=true&w=majority',
-    name: 'heroku_dmgfwrg5',
+    url: 'mongodb+srv://alexey-dred:Docker12345@cluster0.jfnjf.mongodb.net/Ordel ?retryWrites=true&w=majority',
+    name: 'Ordel',
   },
 
   logger: {
