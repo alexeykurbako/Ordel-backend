@@ -1,103 +1,123 @@
-
 const UserRepository = require('./userRepository');
 const cipher = require('../auth/cipherHelper');
+const { ObjectID } = require('mongodb');
 
 class UserService {
-  constructor() {
-    this.repository = new UserRepository();
-  }
+    constructor() {
+        this.repository = new UserRepository();
+    }
 
-  getCount() {
-    return this.repository.getCount();
-  }
+    getCount() {
+        return this.repository.getCount();
+    }
 
-  findByEmail(email) {
-    return this.repository.findByEmail(email);
-  }
+    findByEmailWithClient(email) {
+        return this.repository.findByEmailWithClient(email);
+    }
 
-  findById(id) {
-    return this.repository.findById(id)
-  }
+    findByEmail(email) {
+        return this.repository.findByEmail(email);
+    }
 
-  addUser(user) {
-    return this.repository.add(user);
-  }
+    findById(id) {
+        return this.repository.findById(id)
+    }
 
-  addMany(users) {
-    return this.repository.addMany(users);
-  }
+    addUser(user) {
+        const email = user.email;
 
-  editUser(dto) {
-    const user = this.mapDtoToUser(dto);
-    const userId = dto.id;
+        return this.findByEmailWithClient(email)
+            .then(u => {
+                if (u && u.client) {
+                    throw new Error('User already exists');
+                }
 
-    return this.repository.edit(userId, user)
-      .then(() => {
-          return this.findById(userId);
-      });
-  }
+                const {salt, passwordHash} = cipher.saltHashPassword(user.password);
+                const newUser = {
+                    email: user.email,
+                    login: user.login,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    clientId: ObjectID(user.clientId),
+                    salt,
+                    passwordHash,
+                };
 
-  editCurrentUser(dto) {
-    return this.editUser(dto)
-        .then(user => {
-          return cipher.generateResponseTokens(user);
-        })
-  }
+                return this.repository.add(newUser);
+            })
+            .then(response => {
+                if (response.result.ok === 1) {
+                    return this.findByEmail(email);
+                }
+            })
+    }
 
-  deleteUser(id) {
-    return this.repository.delete(id);
-  }
+    addMany(users) {
+        return this.repository.addMany(users);
+    }
 
-  changePassword(id, salt, passwordHash) {
-    return this.repository.changePassword(id, salt, passwordHash);
-  }
+    editUser(dto) {
+        const user = this.mapDtoToUser(dto);
+        const userId = dto._id;
 
-  getPhoto(userId) {
-    return this.repository.getPhoto(userId);
-  }
+        return this.repository.edit(userId, user)
+            .then(() => {
+                return this.findById(userId);
+            });
+    }
 
-  list(filter) {
-    return Promise.all([
-      this.repository.listFiltered(filter),
-      this.repository.getCountFiltered(filter),
-    ])
-      .then(([data, count]) => {
-        return {
-          items: data.map(item => this.mapUserToDto(item)),
-          totalCount: count,
-        };
-      });
-  }
+    editCurrentUser(dto) {
+        return this.editUser(dto)
+            .then(user => {
+                return cipher.generateResponseTokens(user);
+            })
+    }
 
-  mapUserToDto(user) {
-    return user ? {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      age: user.age,
-      login: user.login,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      address: user.address || {},
-      settings: settingService.mapSettingsToDto(this.getSettings(user.settings)),
-    } : {};
-  }
+    deleteUser(id) {
+        return this.repository.delete(id);
+    }
 
-  getSettings(settings) {
-    return settings && settings.length ? settings[0] : settings;
-  }
+    changePassword(id, salt, passwordHash) {
+        return this.repository.changePassword(id, salt, passwordHash);
+    }
 
-  mapDtoToUser(dto) {
-    return dto ? {
-      email: dto.email,
-      age: dto.age,
-      role: dto.role,
-      login: dto.login,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
-      address: dto.address,
-    } : {};
-  }
+    getPhoto(userId) {
+        return this.repository.getPhoto(userId);
+    }
+
+    list(filter) {
+        return Promise.all([
+            this.repository.listFiltered(filter),
+            this.repository.getCountFiltered(filter),
+        ])
+            .then(([data, count]) => {
+                return {
+                    items: data.map(item => this.mapUserToDto(item)),
+                    totalCount: count,
+                };
+            });
+    }
+
+    mapUserToDto(user) {
+        return user ? {
+            id: user._id,
+            email: user.email,
+            login: user.login,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            clientId: ObjectID(user.clientId)
+        } : {};
+    }
+
+    mapDtoToUser(dto) {
+        return dto ? {
+            email: dto.email,
+            login: dto.login,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            clientId: ObjectID(dto.clientId),
+        } : {};
+    }
 }
 
 module.exports = UserService;

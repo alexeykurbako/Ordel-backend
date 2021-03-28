@@ -3,6 +3,7 @@ const config = require('config');
 const jwt = require('jsonwebtoken');
 const UserService = require('../user/userService');
 const cipher = require('./cipherHelper');
+const { ObjectID } = require('mongodb');
 
 class AuthService {
   constructor() {
@@ -12,7 +13,7 @@ class AuthService {
   register(user) {
     const email = user.email;
 
-    return this.userService.findByEmail(email)
+    return this.userService.findByEmailWithClient(email)
       .then(u => {
         if (u && u.client) {
           throw new Error('User already exists');
@@ -21,9 +22,10 @@ class AuthService {
         const { salt, passwordHash } = cipher.saltHashPassword(user.password);
         const newUser = {
           email: user.email,
-          login: user.fullName,
-          role: 'user',
-          age: 18,
+          login: user.login,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          clientId: ObjectID(user.clientId),
           salt,
           passwordHash,
         };
@@ -32,7 +34,7 @@ class AuthService {
       })
       .then(response => {
         if (response.result.ok === 1) {
-          return this.userService.findByEmail(email);
+          return this.userService.findByEmailWithClient(email);
         }
       });
   }

@@ -7,7 +7,7 @@ const UserService = require('./userService');
 
 const userService = new UserService();
 
-router.get('/', adminGuard, (req, res) => {
+router.get('/users', (req, res) => {
   userService
     .list(req.query)
     .then(users => res.send(users));
@@ -25,28 +25,29 @@ router.put('/users/current', (req, res) => {
     .then(user => res.send(user));
 });
 
-router.get('/:id', adminGuard, (req, res) => {
+router.get('/:id', (req, res) => {
   userService
     .findById(req.params.id)
     .then(user => res.send(user));
 });
 
-router.delete('/:id', adminGuard, (req, res) => {
+router.delete('/:id', (req, res) => {
   userService
     .deleteUser(req.params.id)
     .then(() => res.send({ id: req.params.id }));
 });
 
-router.post('/', adminGuard, (req, res) => {
+router.post('/users', (req, res) => {
   userService
     .addUser(req.body)
-    .then(user => res.send(user));
+    .then(user => res.send(user))
+    .catch(err => res.status(409).send({ error: err.message }));
 });
 
-router.put('/:id', adminGuard, (req, res) => {
+router.put('/:id', (req, res) => {
   userService
     .editUser(req.body)
-    .then(user => res.send(user));
+    .then(user => res.send(user))
 });
 
 router.get('/:userId/photo', (req, res) => {

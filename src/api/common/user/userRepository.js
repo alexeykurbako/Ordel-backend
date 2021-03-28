@@ -31,7 +31,7 @@ class UserRepository extends BaseRepository {
       });
   }
 
-  findByEmail(email) {
+  findByEmailWithClient(email) {
     return this.dbClient
       .then(db => db
         .collection(this.collection)
@@ -53,6 +53,23 @@ class UserRepository extends BaseRepository {
         data.client = data.client && data.client.length ? data.client[0] : data.client;
         return data;
       });
+  }
+
+  findByEmail(email) {
+    return this.dbClient
+        .then(db => db
+            .collection(this.collection)
+            .aggregate([
+              { $match: { email } },
+              { $limit: 1 },
+            ])
+            .toArray())
+        .then(data => {
+          data = (data && data.length ? data[0] : data);
+          delete data.salt;
+          delete data.passwordHash;
+          return data;
+        });
   }
 
   changePassword(id, salt, passwordHash) {

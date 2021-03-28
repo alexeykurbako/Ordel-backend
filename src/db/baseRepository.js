@@ -53,6 +53,7 @@ class BaseRepository {
   }
 
   delete(id) {
+    console.log(id)
     return this.dbClient
       .then(db => db
         .collection(this.collection)

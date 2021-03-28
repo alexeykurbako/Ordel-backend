@@ -21,7 +21,7 @@ passport.use(new LocalStrategy({
 },
 (req, email, password, cb) => {
   userService
-    .findByEmail(email)
+    .findByEmailWithClient(email)
     .then(user => {
       const { passwordHash } = cipher.sha512(password, user.salt);
 
