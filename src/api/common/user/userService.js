@@ -2,6 +2,8 @@ const UserRepository = require('./userRepository');
 const cipher = require('../auth/cipherHelper');
 const { ObjectID } = require('mongodb');
 
+const CLIENT_ID = "5e33e587531bf029f0a8f539";
+
 class UserService {
     constructor() {
         this.repository = new UserRepository();
@@ -38,7 +40,7 @@ class UserService {
                     login: user.login,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    clientId: ObjectID(user.clientId),
+                    clientId: ObjectID(CLIENT_ID),
                     salt,
                     passwordHash,
                 };
@@ -56,13 +58,27 @@ class UserService {
         return this.repository.addMany(users);
     }
 
+
+
     editUser(dto) {
         const user = this.mapDtoToUser(dto);
-        const userId = dto._id;
+        const userId = dto.id ? dto.id : dto._id;
+        // return this.repository.edit(userId, user)
+        //     .then(() => {
+        //         return this.findById(userId);
+        //     });
 
-        return this.repository.edit(userId, user)
-            .then(() => {
-                return this.findById(userId);
+        return this.repository.findAllUsersByEmail(user.email)
+            .then((users) => {
+                if (this._isDuplicateEmail(users, userId)) {
+                    throw Error('Email already exists');
+                }
+
+                return this.repository.edit(userId, user);
+            })
+            .then(() => this.findById(userId))
+            .catch(error => {
+                throw error;
             });
     }
 
@@ -91,10 +107,7 @@ class UserService {
             this.repository.getCountFiltered(filter),
         ])
             .then(([data, count]) => {
-                return {
-                    items: data.map(item => this.mapUserToDto(item)),
-                    totalCount: count,
-                };
+                return data.map(item => this.mapUserToDto(item))
             });
     }
 
@@ -105,7 +118,7 @@ class UserService {
             login: user.login,
             firstName: user.firstName,
             lastName: user.lastName,
-            clientId: ObjectID(user.clientId)
+            clientId: user.clientId
         } : {};
     }
 
@@ -117,6 +130,18 @@ class UserService {
             lastName: dto.lastName,
             clientId: ObjectID(dto.clientId),
         } : {};
+    }
+
+    _isDuplicateEmail(users, userId) {
+        if (users && users.length === 0) {
+            return false;
+        }
+
+        if (users.length > 1) {
+            return true;
+        }
+
+        return users.some(user => user._id.toString() !== userId.toString());
     }
 }
 

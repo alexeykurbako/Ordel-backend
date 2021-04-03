@@ -55,6 +55,14 @@ class UserRepository extends BaseRepository {
       });
   }
 
+    findAllUsersByEmail(email) {
+        return this.dbClient
+            .then(db => db
+                .collection(this.collection)
+                .find({ email })
+                .toArray());
+    }
+
   findByEmail(email) {
     return this.dbClient
         .then(db => db

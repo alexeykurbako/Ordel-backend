@@ -45,9 +45,9 @@ passport.use(new JWTStrategy({
   if (jwtPayload) {
     userService.findById(jwtPayload.id)
       .then(user => {
-        if (req.clientType !== user.client.type) {
-          // throw new Error('Wrong user type');
-        }
+        //   if (req.clientType !== user.client.type) {
+        //   // throw new Error('Wrong user type');
+        // }
       });
   }
 

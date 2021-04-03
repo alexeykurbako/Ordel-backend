@@ -16,7 +16,8 @@ router.get('/users', (req, res) => {
 router.get('/users/current', (req, res) => {
   userService
     .findById(req.user.id)
-    .then(user => res.send(user));
+    .then(user => userService.mapUserToDto(user))
+    .then(user => res.send(user))
 });
 
 router.put('/users/current', (req, res) => {
@@ -25,9 +26,10 @@ router.put('/users/current', (req, res) => {
     .then(user => res.send(user));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/users/:id', (req, res) => {
   userService
     .findById(req.params.id)
+    .then(user => userService.mapUserToDto(user))
     .then(user => res.send(user));
 });
 
@@ -44,10 +46,11 @@ router.post('/users', (req, res) => {
     .catch(err => res.status(409).send({ error: err.message }));
 });
 
-router.put('/:id', (req, res) => {
+router.put('/users/:id', (req, res) => {
   userService
     .editUser(req.body)
     .then(user => res.send(user))
+    .catch(err => res.status(409).send({ error: err.message }));
 });
 
 router.get('/:userId/photo', (req, res) => {
