@@ -33,8 +33,8 @@ function clientErrorHandler(err, req, res, next) {
     next(err);
   }
 }
-
 app.use(cors());
+app.use(express.json({ limit: '5MB' }));
 app.use(bodyParser.json());
 
 const auth = passport.authenticate('jwt', { session: false });

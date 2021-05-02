@@ -63,10 +63,10 @@ function decipherResetPasswordToken(ciphered) {
 
 function generateResponseTokens(user) {
   const normalizedUser = {
-    id: user.id,
+    id: user.id ? user.id : user._id,
     clientId: user.clientId,
   };
-
+  console.log(normalizedUser);
   const accessToken = jwt.sign(normalizedUser,
     config.get('auth.jwt.accessTokenSecret'),
     { expiresIn: config.get('auth.jwt.accessTokenLife') });

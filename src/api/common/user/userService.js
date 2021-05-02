@@ -85,8 +85,12 @@ class UserService {
     editCurrentUser(dto) {
         return this.editUser(dto)
             .then(user => {
-                return cipher.generateResponseTokens(user);
-            })
+                const response = cipher.generateResponseTokens(user);
+                response.id = user.id ? user.id : user._id;
+                response.clientId = user.clientId;
+                response.name = `${user.firstName} ${user.lastName}`;
+                return response;
+            } );
     }
 
     deleteUser(id) {
