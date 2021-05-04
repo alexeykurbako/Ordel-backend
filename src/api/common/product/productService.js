@@ -93,9 +93,34 @@ class ProductService {
                 const productItem = {
                     productId: ObjectID(res.insertedId),
                     clientId: ObjectID(CLIENT_ID),
-                    price: product.price,
+                    price: parseInt(product.price),
+                    count: parseInt(product.count),
                 };
                 return this.productItemRepository.add(productItem);
+            });
+    }
+
+    async updateProduct(product) {
+        const preparedProduct = this.mapProductDtoToProduct(product);
+        const oldProduct = await this.repository.findById(preparedProduct.id)
+
+        const imageUrl = preparedProduct.image == oldProduct.image ? preparedProduct.image : BASE_BUCKET_URL + await this.uploadImageToS3(preparedProduct.image);
+        preparedProduct.image = imageUrl;
+        preparedProduct.id = product.id;
+        preparedProduct.productItemId = product.productItemId;
+        console.log(preparedProduct)
+
+
+        return this.repository
+            .edit(product.id, preparedProduct)
+            .then(res => {
+                const productItem = {
+                    productId: ObjectID(preparedProduct.id),
+                    clientId: ObjectID(CLIENT_ID),
+                    price: parseInt(product.price),
+                    count: parseInt(product.count),
+                };
+                return this.productItemRepository.edit(product.productItemId, productItem);
             });
     }
 }

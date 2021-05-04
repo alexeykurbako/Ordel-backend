@@ -19,4 +19,11 @@ router.post('/products', (req, res) => {
       .catch(err => res.status(409).send({ error: err.message }));
 });
 
+router.put('/products', (req, res) => {
+  productService
+      .updateProduct(req.body)
+      .then(user => res.send(user))
+      .catch(err => res.status(409).send({ error: err.message }));
+});
+
 module.exports = router;
