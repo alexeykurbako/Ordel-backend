@@ -2,7 +2,7 @@ const UserRepository = require('./userRepository');
 const cipher = require('../auth/cipherHelper');
 const { ObjectID } = require('mongodb');
 
-const CLIENT_ID = "5e33e587531bf029f0a8f539";
+const CLIENT_ID = "5e3bd04c8f674446483c0670";
 
 class UserService {
     constructor() {

@@ -113,7 +113,7 @@ class OrderService {
             this.clientRepository.findById(order.supplierId),
             this.clientRepository.findById(order.customerId),
           ])
-            .then(([supplier, customer]) => this.emailService.notifySupplier(supplier, customer, order));
+            // .then(([supplier, customer]) => this.emailService.notifySupplier(supplier, customer, order));
         });
     }, orders);
     return Promise.resolve({ message: 'ok' });
